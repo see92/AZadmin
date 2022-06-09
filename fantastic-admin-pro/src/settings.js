@@ -32,7 +32,7 @@ let globalSettings = {
     // 是否始终显示主侧边栏，设置为 false 且主侧边栏里只有一个导航时，主侧边栏会自动隐藏
     alwaysShowMainSidebar: false,
     // 是否开启侧边栏展开收起按钮
-    enableSidebarCollapse: false,
+    enableSidebarCollapse: true,
     // 侧边栏是否收起
     sidebarCollapse: false,
     // 切换侧边栏同时跳转页面
@@ -46,13 +46,13 @@ let globalSettings = {
     // 是否开启面包屑导航
     enableBreadcrumb: true,
     // 是否显示底部版权信息，同时在路由 meta 对象里可以单独设置某个路由是否显示底部版权信息
-    showCopyright: true,
+    showCopyright: false,
     // 版权信息配置，格式为：Copyright © [dates] <company>
     copyrightDates: '2021',
     copyrightCompany: 'Fantastic-admin',
     copyrightWebsite: 'https://hooray.gitee.io/fantastic-admin',
     // 是否开启导航搜索
-    enableNavSearch: true,
+    enableNavSearch: false,
     // 是否开启通知中心
     enableNotification: false,
     // 是否开启国际化
@@ -60,7 +60,7 @@ let globalSettings = {
     // 默认语言，留空则跟随系统
     defaultLang: '',
     // 是否开启移动端适配，开启后当页面宽度小于 992px 时自动切换为移动端展示
-    enableMobileAdaptation: true,
+    enableMobileAdaptation: false,
     // 是否开启全屏
     enableFullscreen: false,
     // 是否开启页面刷新
@@ -82,7 +82,7 @@ let globalSettings = {
     // 是否在非开发环境开启错误日志功能，具体业务代码在 ./util/error.log.js
     enableErrorLog: false,
     // 是否开启主题配置（建议在生产环境关闭）
-    enableThemeSetting: true
+    enableThemeSetting: false
 }
 
 export default globalSettings

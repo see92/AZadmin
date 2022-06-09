@@ -1,6 +1,4 @@
 import Layout from '@/layout'
-// import EmptyLayout from '@/layout/empty'
-
 export default {
     path: '/list_example',
     component: Layout,

@@ -15,21 +15,35 @@
             <el-table-column label="操作" align="center" fixed="right">
                 <template slot-scope="scope">
                     <el-button @click="add(scope.row)">增加</el-button>
-                    <el-button @click="add(scope.row)">增加</el-button>
-                    <el-button @click="add(scope.row)">增加</el-button>
+                    <!-- <el-button @click="add(scope.row)">增加</el-button>
+                    <el-button @click="add(scope.row)">增加</el-button> -->
                 </template>
             </el-table-column>
             <PageMain :table_header="tableHeader" />
         </el-table>
+        <!-- <el-pagination
+            align="center"
+            layout="prev,pager,next"
+            :total="1000"
+            :current-page="currentPage"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+        /> -->
+        <pagination
+            :pagination-data="pagination"
+            @handleCurrentChange="handleCurrentChange"
+        />
     </div>
 </template>
 
 <script>
 import PageMain from './pageMain'
+import Pagination from './pagination'
 export default {
     name: 'Page',
     components: {
-        PageMain
+        PageMain,
+        Pagination
     },
     data() {
         return {
@@ -75,8 +89,64 @@ export default {
                     name: '腾讯',
                     level: '二级',
                     company: '腾讯'
+                },
+                {
+                    website: 'www.baidu.com',
+                    name: '百度一下',
+                    level: '一级',
+                    company: '百度'
+                },
+                {
+                    website: 'www.Google.com',
+                    name: '谷歌',
+                    level: '一级',
+                    company: '谷歌'
+                },
+                {
+                    website: 'github.com',
+                    name: 'github',
+                    level: '二级',
+                    company: 'github'
+                },
+                {
+                    website: 'www.qq.com',
+                    name: '腾讯',
+                    level: '二级',
+                    company: '腾讯'
+                },
+                {
+                    website: 'www.baidu.com',
+                    name: '百度一下',
+                    level: '一级',
+                    company: '百度'
+                },
+                {
+                    website: 'www.Google.com',
+                    name: '谷歌',
+                    level: '一级',
+                    company: '谷歌'
+                },
+                {
+                    website: 'github.com',
+                    name: 'github',
+                    level: '二级',
+                    company: 'github'
+                },
+                {
+                    website: 'www.qq.com',
+                    name: '腾讯',
+                    level: '二级',
+                    company: '腾讯'
                 }
             ]
+        }
+    },
+    methods: {
+        handleCurrentChange(data) {
+            this.pagination.currentPage = data.currentPage
+            this.pagination.size = data.pageSize
+            this.getData()
+
         }
     }
 }
