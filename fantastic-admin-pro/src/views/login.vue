@@ -3,65 +3,63 @@
         <div class="bg-banner" />
         <div id="login-box">
             <div class="login-banner" />
-            <el-form v-show="formType == 'login'" ref="loginForm" :model="loginForm" :rules="loginRules" size="default" class="login-form" autocomplete="on" label-position="left">
+            <el-form
+                v-show="formType == 'login'"
+                ref="loginForm"
+                :model="loginForm"
+                :rules="loginRules"
+                size="default"
+                class="login-form"
+                autocomplete="on"
+                label-position="left"
+            >
                 <div class="title-container">
                     <h3 class="title">{{ title }}管理后台</h3>
                 </div>
                 <div>
                     <el-form-item prop="account">
-                        <el-input ref="name" v-model="loginForm.account" :placeholder="$t('app.account')" type="text" tabindex="1" autocomplete="on">
+                        <el-input
+                            ref="name"
+                            v-model="loginForm.account"
+                            :placeholder="$t('app.account')"
+                            type="number"
+                            maxlength="11"
+                            tabindex="1"
+                            autocomplete="on"
+                        >
                             <svg-icon slot="prefix" name="user" />
                         </el-input>
                     </el-form-item>
                     <el-form-item prop="password">
-                        <el-input ref="password" v-model="loginForm.password" :type="passwordType" :placeholder="$t('app.password')" tabindex="2" autocomplete="on" @keyup.enter.native="handleLogin">
+                        <el-input
+                            ref="password"
+                            v-model="loginForm.password"
+                            type="number"
+                            :placeholder="$t('app.password')"
+                            tabindex="2"
+                            autocomplete="on"
+                            @keyup.enter.native="handleLogin"
+                        >
                             <svg-icon slot="prefix" name="password" />
-                            <svg-icon slot="suffix" :name="passwordType === 'password' ? 'eye' : 'eye-open'" @click="showPassword" />
                         </el-input>
+                        <el-button
+                            class="code"
+                            type="primary"
+                            @click="getCode(loginForm.account)"
+                        >
+                            {{ codeMsg }}
+                        </el-button>
                     </el-form-item>
                 </div>
-                <div class="flex-bar">
-                    <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
-                    <el-button type="text" @click="formType = 'reset'">忘记密码</el-button>
-                </div>
-                <el-button :loading="loading" type="primary" size="default" style="width: 100%;" @click.native.prevent="handleLogin">{{ $t('app.login') }}</el-button>
-                <div style="margin-top: 20px; margin-bottom: -10px; color: #666; font-size: 14px; text-align: center; font-weight: bold;">
-                    <span style="margin-right: 5px;">演示帐号一键登录：</span>
-                    <el-button type="danger" size="mini" @click="testAccount('admin')">admin</el-button>
-                    <el-button type="danger" size="mini" plain @click="testAccount('test')">test</el-button>
-                </div>
-            </el-form>
-            <el-form v-show="formType == 'reset'" ref="resetForm" :model="resetForm" :rules="resetRules" size="default" class="login-form" auto-complete="on" label-position="left">
-                <div class="title-container">
-                    <h3 class="title">重置密码</h3>
-                </div>
-                <div>
-                    <el-form-item prop="account">
-                        <el-input ref="name" v-model="resetForm.account" :placeholder="$t('app.account')" type="text" tabindex="1" autocomplete="on">
-                            <svg-icon slot="prefix" name="user" />
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="captcha">
-                        <el-input ref="captcha" v-model="resetForm.captcha" :placeholder="$t('app.captcha')" type="text" tabindex="2" autocomplete="on">
-                            <svg-icon slot="prefix" name="user" />
-                            <el-button slot="append">{{ $t('app.sendCaptcha') }}</el-button>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="newPassword">
-                        <el-input ref="newPassword" v-model="resetForm.newPassword" :type="passwordType" :placeholder="$t('app.newPassword')" tabindex="3" autocomplete="on">
-                            <svg-icon slot="prefix" name="password" />
-                            <svg-icon slot="suffix" :name="passwordType === 'password' ? 'eye' : 'eye-open'" @click="showPassword" />
-                        </el-input>
-                    </el-form-item>
-                </div>
-                <el-row :gutter="15" style="padding-top: 20px;">
-                    <el-col :md="6">
-                        <el-button size="default" style="width: 100%;" @click="formType = 'login'">{{ $t('app.goLogin') }}</el-button>
-                    </el-col>
-                    <el-col :md="18">
-                        <el-button :loading="loading" type="primary" size="default" style="width: 100%;" @click.native.prevent="handleFind">{{ $t('app.check') }}</el-button>
-                    </el-col>
-                </el-row>
+                <el-button
+                    :loading="loading"
+                    type="primary"
+                    size="default"
+                    style="width: 100%;"
+                    @click.native.prevent="handleLogin"
+                >
+                    {{ $t("app.login") }}
+                </el-button>
             </el-form>
         </div>
         <Copyright v-if="$store.state.settings.showCopyright" />
@@ -84,12 +82,10 @@ export default {
                 remember: storage.local.has('login_account')
             },
             loginRules: {
-                account: [
-                    { required: true, trigger: 'blur', message: '请输入用户名' }
-                ],
+                account: [{ required: true, trigger: 'blur', message: '请输入手机号' }],
                 password: [
-                    { required: true, trigger: 'blur', message: '请输入密码' },
-                    { min: 6, max: 18, trigger: 'blur', message: '密码长度为6到18位' }
+                    { required: true, trigger: 'blur', message: '请输入验证码' },
+                    { min: 0, max: 6, trigger: 'blur', message: '验证码长度为0到6位' }
                 ]
             },
             resetForm: {
@@ -97,21 +93,14 @@ export default {
                 captcha: '',
                 newPassword: ''
             },
-            resetRules: {
-                account: [
-                    { required: true, trigger: 'blur', message: '请输入用户名' }
-                ],
-                captcha: [
-                    { required: true, trigger: 'blur', message: '请输入验证码' }
-                ],
-                newPassword: [
-                    { required: true, trigger: 'blur', message: '请输入新密码' },
-                    { min: 6, max: 18, trigger: 'blur', message: '密码长度为6到18位' }
-                ]
-            },
             loading: false,
-            passwordType: 'password',
-            redirect: undefined
+            passwordType: 'number',
+            redirect: undefined,
+            codeDisabled: false,
+            codeMsg: '获取验证码',
+            countdown: 60,
+            timer: null
+
         }
     },
     watch: {
@@ -132,43 +121,67 @@ export default {
         handleLogin() {
             this.$refs.loginForm.validate(valid => {
                 if (valid) {
-                    this.loading = true
-                    this.$store.dispatch('user/login', this.loginForm).then(() => {
-                        this.loading = false
-                        if (this.loginForm.remember) {
-                            storage.local.set('login_account', this.loginForm.account)
-                        } else {
-                            storage.local.remove('login_account')
-                        }
-                        this.$router.push({ path: this.redirect || '/' })
-                    }).catch(() => {
-                        this.loading = false
+                    this.$api
+                        .get(
+                            // eslint-disable-next-line no-undef
+                            `api/account/get_token?phone=${loginForm.account}&code=${loginForm.password}`
+                        )
+
+                        .then(res => {
+                            this.$router.push({ path: this.redirect || '/' })
+                        })
+                    // this.loading = true
+                    // this.$store
+                    //     .dispatch('user/login', this.loginForm)
+                    //     .then(() => {
+                    //         this.loading = false
+                    //         if (this.loginForm.remember) {
+                    //             storage.local.set('login_account', this.loginForm.account)
+                    //         } else {
+                    //             storage.local.remove('login_account')
+                    //         }
+                    //         this.$router.push({ path: this.redirect || '/' })
+                    //     })
+                    //     .catch(() => {
+                    //         this.loading = false
+                    //     })
+                }
+            })
+        },
+        getCode(mobile) {
+            // const phoneReg = /^1[3456789]\d{9}$/
+            // if (!phoneReg.test(mobile)) {
+            //     this.$message.success('请输入正确格式的手机号')
+            // } else {
+            //     this.$api
+            //         .get(`api/account/get_sms_code?phone=${mobile}`)
+            //         .then(res => {
+            //             console.log(res)
+            //         })
+            // }
+            // this.$api
+            //     .get('api/account/get_sms_code?phone=110')
+            //     .then(res => {
+            //         console.log(res)
+            //     })
+
+            const phoneReg = /^1[3456789]\d{9}$/
+            if (!phoneReg.test(mobile)) {
+                this.$message.success('请输入正确格式的手机号')
+            } else {
+                this.$api
+                    .get(`api/account/get_sms_code?phone=${mobile}`)
+                    .then(res => {
+                        console.log(res)
                     })
-                }
-            })
-        },
-        handleFind() {
-            this.$message({
-                message: '重置密码仅提供界面演示，无实际功能，需开发者自行扩展',
-                type: 'info'
-            })
-            this.$refs.resetForm.validate(valid => {
-                if (valid) {
-                    // 这里编写业务代码
-                }
-            })
-        },
-        testAccount(account) {
-            this.loginForm.account = account
-            this.loginForm.password = '123456'
-            this.handleLogin()
+            }
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
-[data-mode=mobile] {
+[data-mode="mobile"] {
     #login-box {
         max-width: 80%;
         .login-banner {
@@ -176,7 +189,7 @@ export default {
         }
     }
 }
-::v-deep input[type=password]::-ms-reveal {
+::v-deep input[type="password"]::-ms-reveal {
     display: none;
 }
 .bg-banner {
@@ -252,5 +265,20 @@ export default {
     width: 100%;
     margin: 0;
     mix-blend-mode: difference;
+}
+::v-deep .el-form-item__content {
+    display: flex;
+}
+.code {
+    margin-left: 20px;
+    display: inline-block;
+    min-width: 112px;
+}
+::v-deep input::-webkit-outer-spin-button,
+::v-deep input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+}
+::v-deep input[type="‘number’"] {
+    -moz-appearance: textfield !important;
 }
 </style>

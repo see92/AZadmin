@@ -12,8 +12,8 @@
 <script>
 export default {
     name: 'PageMain',
-    prop: {
-        table_header: {
+    props: {
+        tableList: {
             type: Array,
             default: () => {
                 return []
@@ -39,7 +39,6 @@ export default {
                     label: '公司',
                     prop: 'company'
                 }
-
             ],
             tableData: [
                 {

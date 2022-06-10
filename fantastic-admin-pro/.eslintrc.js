@@ -21,6 +21,7 @@ module.exports = {
     },
     rules: {
         // 代码风格
+        // "camelcase": ["error", {"allow": ["aa_bb"]}],
         'block-spacing': [2, 'always'],
         'brace-style': [2, '1tbs', {
             'allowSingleLine': true

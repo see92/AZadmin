@@ -15,35 +15,19 @@
             <el-table-column label="操作" align="center" fixed="right">
                 <template slot-scope="scope">
                     <el-button @click="add(scope.row)">增加</el-button>
-                    <!-- <el-button @click="add(scope.row)">增加</el-button>
-                    <el-button @click="add(scope.row)">增加</el-button> -->
                 </template>
             </el-table-column>
-            <PageMain :table_header="tableHeader" />
+            <PageMain :table-list="tableHeader" />
         </el-table>
-        <!-- <el-pagination
-            align="center"
-            layout="prev,pager,next"
-            :total="1000"
-            :current-page="currentPage"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-        /> -->
-        <pagination
-            :pagination-data="pagination"
-            @handleCurrentChange="handleCurrentChange"
-        />
     </div>
 </template>
 
 <script>
 import PageMain from './pageMain'
-import Pagination from './pagination'
 export default {
     name: 'Page',
     components: {
-        PageMain,
-        Pagination
+        PageMain
     },
     data() {
         return {
@@ -139,6 +123,7 @@ export default {
                     company: '腾讯'
                 }
             ]
+
         }
     },
     methods: {
@@ -146,7 +131,6 @@ export default {
             this.pagination.currentPage = data.currentPage
             this.pagination.size = data.pageSize
             this.getData()
-
         }
     }
 }

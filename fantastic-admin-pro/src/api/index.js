@@ -54,6 +54,7 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     response => {
+        console.log(response, 'rrr')
         if (response.data.error != '') {
             // 如果接口请求时发现 token 失效，则立马跳转到登录页
             if (response.data.status == 0) {

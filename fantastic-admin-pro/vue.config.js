@@ -55,6 +55,7 @@ const isGZIP = process.env.VUE_APP_GZIP == 'ON'
 module.exports = {
     publicPath: '',
     productionSourceMap: false,
+    lintOnSave:false,
     devServer: {
         open: true
         // proxy: {
