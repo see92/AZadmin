@@ -57,7 +57,7 @@ const constantRoutes = [
                         component: () => import('@/views/personal/edit.password'),
                         meta: {
                             title: '修改密码',
-                            i18n: 'route.personal.editpassword'
+                            i18n: 'route.personal.editpa+ssword'
                         }
                     }
                 ]

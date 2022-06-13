@@ -20,6 +20,8 @@ module.exports = {
         sourceType: 'module'
     },
     rules: {
+        'no-undef': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+        "no-unused-vars":"off",
         // 代码风格
         // "camelcase": ["error", {"allow": ["aa_bb"]}],
         'block-spacing': [2, 'always'],

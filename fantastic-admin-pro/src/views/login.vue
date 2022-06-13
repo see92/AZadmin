@@ -100,7 +100,6 @@ export default {
             codeMsg: '获取验证码',
             countdown: 60,
             timer: null
-
         }
     },
     watch: {
@@ -123,12 +122,12 @@ export default {
                 if (valid) {
                     this.$api
                         .get(
-                            // eslint-disable-next-line no-undef
-                            `api/account/get_token?phone=${loginForm.account}&code=${loginForm.password}`
+                            `api/account/get_token?phone=${this.loginForm.account}&code=${this.loginForm.password}`
                         )
-
                         .then(res => {
-                            this.$router.push({ path: this.redirect || '/' })
+                            // this.$router.push({ path: this.redirect || '/' })
+                            localStorage.setItem('token', res.token), console.log(res.token)
+                            this.getUser()
                         })
                     // this.loading = true
                     // this.$store
@@ -142,13 +141,18 @@ export default {
                     //         }
                     //         this.$router.push({ path: this.redirect || '/' })
                     //     })
-                    //     .catch(() => {
-                    //         this.loading = false
-                    //     })
+                    // .catch(() => {
+                    //     this.loading = false
+                    // })
                 }
             })
         },
+        // 获取验证码
         getCode(mobile) {
+            this.$api.get('api/account/get_sms_code?phone=110').then(res => {
+                console.log(res)
+            })
+            // 手机号校验获取验证码
             // const phoneReg = /^1[3456789]\d{9}$/
             // if (!phoneReg.test(mobile)) {
             //     this.$message.success('请输入正确格式的手机号')
@@ -159,22 +163,36 @@ export default {
             //             console.log(res)
             //         })
             // }
-            // this.$api
-            //     .get('api/account/get_sms_code?phone=110')
-            //     .then(res => {
-            //         console.log(res)
-            //     })
-
-            const phoneReg = /^1[3456789]\d{9}$/
-            if (!phoneReg.test(mobile)) {
-                this.$message.success('请输入正确格式的手机号')
-            } else {
-                this.$api
-                    .get(`api/account/get_sms_code?phone=${mobile}`)
-                    .then(res => {
-                        console.log(res)
-                    })
+            // 倒计时获取验证码
+            if (!this.timer) {
+                this.timer = setInterval(() => {
+                    if (this.countdown > 0 && this.countdown <= 60) {
+                        this.countdown--
+                        if (this.countdown !== 0) {
+                            this.codeMsg = `${this.countdown} S`
+                        } else {
+                            clearInterval(this.timer)
+                            this.codeMsg = '获取验证码'
+                            this.countdown = 60
+                            this.timer = null
+                            this.codeDisabled = false
+                        }
+                    }
+                }, 1000)
             }
+        },
+        // 获取当前用户
+        getUser() {
+            this.$api.get('api/account/GetUser').then(res => {
+                this.getMenu()
+            })
+        },
+        // 获取权限菜单
+        getMenu() {
+            this.$api.get('api/account/get_permission_menu').then(res => {
+                console.log(res, '权限列表')
+                this.$router.push({path: this.redirect || '/'})
+            })
         }
     }
 }

@@ -48,22 +48,29 @@ api.interceptors.request.use(
                 request.params.token = store.state.user.token
             }
         }
+        console.log(store.state.user.token, 'tttt')
+        request.headers['Authorization'] = `Bearer ${JSON.parse(JSON.stringify(localStorage.getItem('token')))}`
         return request
     }
 )
 
 api.interceptors.response.use(
     response => {
-        console.log(response, 'rrr')
-        if (response.data.error != '') {
-            // 如果接口请求时发现 token 失效，则立马跳转到登录页
-            if (response.data.status == 0) {
-                toLogin()
-            }
-            Message.error(response.data.error)
-            return Promise.reject(response.data)
+        // console.log(response, 'rrr')
+        //  if (response.data.error != '') {
+        // 如果接口请求时发现 token 失效，则立马跳转到登录页
+        //    if (response.data.status == 0) {
+        //        toLogin()
+        //     }
+        //     Message.error(response.data.error)
+        //      return Promise.reject(response.data)
+        // }
+        // return Promise.resolve(response.data)
+        if (response.status == 200) {
+            return response.data
+        } else {
+            Message.error(response.message)
         }
-        return Promise.resolve(response.data)
     },
     error => {
         return Promise.reject(error)
