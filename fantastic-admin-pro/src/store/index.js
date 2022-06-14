@@ -10,6 +10,5 @@ require_module.keys().forEach(file_name => {
 })
 
 export default new Vuex.Store({
-    modules: modules,
-    strict: process.env.NODE_ENV !== 'production'
+    modules: modules
 })

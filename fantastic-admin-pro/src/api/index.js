@@ -48,8 +48,9 @@ api.interceptors.request.use(
                 request.params.token = store.state.user.token
             }
         }
-        console.log(store.state.user.token, 'tttt')
-        request.headers['Authorization'] = `Bearer ${JSON.parse(JSON.stringify(localStorage.getItem('token')))}`
+        console.log(store.state.user.token)
+        console.log(localStorage.getItem('token'))
+        request.headers['Authorization'] = `Bearer ${store.state.user.token}`
         return request
     }
 )

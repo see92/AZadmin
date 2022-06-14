@@ -3,8 +3,18 @@ import VueRouter from 'vue-router'
 import store from '@/store/index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css' // progress bar style
-
+import storage from '@/util/storage'
 Vue.use(VueRouter)
+// 刷新或者重新进入页面
+let fullPath = storage.local.get('fullPath')
+let fullPathData = fullPath
+    ? storage.local
+        .get('fullPath')
+        .substring(2, storage.local.get('fullPath').length - 1)
+    : ''
+let NcheckRouterData = storage.local.get('NcheckRouterData')
+    ? JSON.parse(storage.local.get('NcheckRouterData'))
+    : ''
 
 import Layout from '@/layout'
 import EmptyLayout from '@/layout/empty'
@@ -19,10 +29,16 @@ const constantRoutes = [
             i18n: 'route.login'
         }
     },
+
     {
         path: '/',
         component: Layout,
-        redirect: '/dashboard',
+        redirect: fullPath
+            ? fullPathData
+            : NcheckRouterData
+                // ? NcheckRouterData[0].resourceUrl
+                ? NcheckRouterData[0].perms
+                : '',
         children: [
             {
                 path: 'dashboard',
@@ -54,10 +70,11 @@ const constantRoutes = [
                     {
                         path: 'edit/password',
                         name: 'personalEditPassword',
-                        component: () => import('@/views/personal/edit.password'),
+                        component: () =>
+                            import('@/views/personal/edit.password'),
                         meta: {
                             title: '修改密码',
-                            i18n: 'route.personal.editpa+ssword'
+                            i18n: 'route.personal.editpassword'
                         }
                     }
                 ]
@@ -71,35 +88,16 @@ const constantRoutes = [
     }
 ]
 
-import MultilevelMenuExample from './modules/multilevel.menu.example'
-import BreadcrumbExample from './modules/breadcrumb.example'
-import SystemPermissions from './modules/SystemPermissions'
-import ListExample from './modules/list.example'
-
-// 当 children 不为空的主导航只有一项时，则隐藏
-let asyncRoutes = [
+const lastRoute = [
     {
+        path: '*',
+        component: () => import('@/views/404'),
         meta: {
-            title: '演示',
-            icon: 'sidebar-default'
-        },
-        children: [
-            MultilevelMenuExample,
-            BreadcrumbExample,
-            SystemPermissions,
-            ListExample
-        ]
+            title: '404',
+            sidebar: false
+        }
     }
 ]
-
-const lastRoute = [{
-    path: '*',
-    component: () => import('@/views/404'),
-    meta: {
-        title: '404',
-        sidebar: false
-    }
-}]
 
 const router = new VueRouter({
     routes: constantRoutes
@@ -117,27 +115,92 @@ VueRouter.prototype.replace = function replace(location) {
 
 router.beforeEach(async(to, from, next) => {
     store.state.settings.enableProgress && NProgress.start()
-    // 已经登录，但还没根据权限动态生成并挂载路由
+    // 已经登录，但还没根据权限动态生成并挂载路由`
     if (store.getters['user/isLogin'] && !store.state.menu.isGenerate) {
         // 挂载动态路由的同时，根据当前帐号复原固定标签栏
-        store.state.settings.enableTabbar && store.commit('tabbar/recoveryStorage', store.state.user.account)
-        /**
-         * 重置 matcher
-         * https://blog.csdn.net/baidu_28647571/article/details/101711682
-         */
+        store.state.settings.enableTabbar &&
+            store.commit('tabbar/recoveryStorage', store.state.user.account)
         router.matcher = new VueRouter({
             routes: constantRoutes
         }).matcher
-        const accessRoutes = await store.dispatch('menu/generateRoutes', {
-            asyncRoutes,
-            currentPath: to.path
-        })
-        accessRoutes.push(...lastRoute)
-        accessRoutes.forEach(route => {
-            router.addRoute(route)
-        })
-        next({ ...to, replace: true })
+
+        // 未处理
+        let nCheckRoutes = store.getters['user/getNoCheckData']
+        if (nCheckRoutes && nCheckRoutes.length > 0) {
+            if (from.path.indexOf('login') == -1) {
+                // 配置完成后刷新页面更新路由
+                nCheckRoutes = await store
+                    .dispatch('user/getNewRouterInfo')
+                    .then(res => {
+                        storage.local.set(
+                            'NcheckRouterData',
+                            JSON.stringify(res)
+                        )
+                        return res
+                    })
+            }
+            // 处理完成
+            let asyncRoutes = await store.dispatch('user/getCheckRouterData')
+
+            // 首次登录
+            if (from.name == 'login') {
+                next({
+                    path: asyncRoutes[0].children[0].redirect
+                })
+            } else {
+                const flag = asyncRoutes[0].children.some(item => {
+                    if (item.children && item.children.length > 0) {
+                        return item.children.some(
+                            each => fullPathData.indexOf(each.path) > -1
+                        )
+                    } else {
+                        return item.redirect.indexOf(fullPathData) > -1
+                    }
+                })
+                if (!flag) {
+                    fullPathData = asyncRoutes[0].children[0].redirect
+                    next({
+                        path: asyncRoutes[0].children[0].redirect,
+                        replace: true
+                    })
+                }
+
+                if (
+                    storage.local.get('fullPath') &&
+                    storage.local.get('fullPath').length == 3
+                ) {
+                    next({
+                        path: asyncRoutes[0].children[0].redirect
+                    })
+                }
+                if (from.path == '/') {
+                    next({
+                        path: storage.local.set('fullPath')
+                    })
+                }
+                // }
+            }
+
+            const accessRoutes = await store.dispatch('menu/generateRoutes', {
+                asyncRoutes,
+                currentPath: to.path
+            })
+            router.addRoutes(accessRoutes)
+            router.addRoutes(lastRoute)
+            next({ ...to, replace: true })
+        } else {
+            store.commit('user/removeUserData')
+            if (to.name != 'login') {
+                next({
+                    name: 'login',
+                    query: {
+                        redirect: to.fullPath
+                    }
+                })
+            }
+        }
     }
+    storage.local.set('fullPath', JSON.stringify(to.fullPath))
     if (store.state.menu.isGenerate) {
         store.commit('menu/setHeaderActived', to.path)
     }
@@ -147,17 +210,23 @@ router.beforeEach(async(to, from, next) => {
                 // 如果已登录状态下，进入登录页会强制跳转到控制台页面
                 if (to.name == 'login') {
                     next({
-                        name: 'dashboard',
+                        name: 'basicsInformation',
                         replace: true
                     })
-                } else if (!store.state.settings.enableDashboard && to.name == 'dashboard') {
+                } else if (
+                    !store.state.settings.enableDashboard &&
+                    to.name == 'dashboard'
+                ) {
                     // 如果未开启控制台页面，则默认进入第一个固定标签栏或者侧边栏导航第一个模块
-                    if (store.state.settings.enableTabbar && store.state.tabbar.list.length > 0) {
+                    if (
+                        store.state.settings.enableTabbar &&
+                        store.state.tabbar.list.length > 0
+                    ) {
                         next({
                             path: store.state.tabbar.list[0].path,
                             replace: true
                         })
-                    } else if (store.getters['menu/sidebarRoutes'].length > 0) {
+                    } else {
                         next({
                             path: store.getters['menu/sidebarRoutes'][0].path,
                             replace: true

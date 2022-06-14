@@ -22,7 +22,7 @@
                             ref="name"
                             v-model="loginForm.account"
                             :placeholder="$t('app.account')"
-                            type="number"
+                            type="text"
                             maxlength="11"
                             tabindex="1"
                             autocomplete="on"
@@ -34,7 +34,7 @@
                         <el-input
                             ref="password"
                             v-model="loginForm.password"
-                            type="number"
+                            type="text"
                             :placeholder="$t('app.password')"
                             tabindex="2"
                             autocomplete="on"
@@ -56,7 +56,7 @@
                     type="primary"
                     size="default"
                     style="width: 100%;"
-                    @click.native.prevent="handleLogin"
+                    @click.native.prevent="getMenu"
                 >
                     {{ $t("app.login") }}
                 </el-button>
@@ -149,8 +149,9 @@ export default {
         },
         // 获取验证码
         getCode(mobile) {
+            // this.$api.get(`api/account/get_sms_code?phone=${mobile}`).then(res => {
             this.$api.get('api/account/get_sms_code?phone=110').then(res => {
-                console.log(res)
+                // console.log(res)
             })
             // 手机号校验获取验证码
             // const phoneReg = /^1[3456789]\d{9}$/
@@ -181,23 +182,49 @@ export default {
                 }, 1000)
             }
         },
-        // 获取当前用户
-        getUser() {
-            this.$api.get('api/account/GetUser').then(res => {
+        // 获取token
+        getToken() {
+            this.$api.get('api/account/get_token?phone=110&code=110').then(res => {
+                // storage.local.set('token', res.token)
+                this.$store.commit('user/setUserData', res)
                 this.getMenu()
             })
         },
+        // 获取当前用户
+        getUser() {
+            this.$api.get('api/account/GetUser').then(res => {
+                // console.log(res.token, 'rrr')
+                // this.getMenu()
+            })
+        },
         // 获取权限菜单
+        // getMenu() {
+        //     this.$api.get('api/account/get_permission_menu').then(res => {
+        //         console.log(res, '权限列表')
+        //         this.$router.push({path: this.redirect || '/'})
+        //     })
+        // }
         getMenu() {
-            this.$api.get('api/account/get_permission_menu').then(res => {
-                console.log(res, '权限列表')
-                this.$router.push({path: this.redirect || '/'})
+            this.$refs.loginForm.validate(valid => {
+                if (valid) {
+                    this.$store.dispatch('user/login').then(() => {
+                        if (this.loginForm.remember) {
+                            storage.local.set('login_account', this.loginForm.account)
+                        } else {
+                            storage.local.remove('login_account')
+                        }
+                        this.$router.push({
+                            path: `/${
+                                JSON.parse(storage.local.get('NcheckRouterData'))[0].perms
+                            }`
+                        })
+                    })
+                }
             })
         }
     }
 }
 </script>
-
 <style lang="scss" scoped>
 [data-mode="mobile"] {
     #login-box {
