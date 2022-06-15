@@ -38,8 +38,8 @@
                             :placeholder="$t('app.password')"
                             tabindex="2"
                             autocomplete="on"
-                            @keyup.enter.native="handleLogin"
                         >
+                            <!-- @keyup.enter.native="handleLogin" -->
                             <svg-icon slot="prefix" name="password" />
                         </el-input>
                         <el-button
@@ -56,7 +56,7 @@
                     type="primary"
                     size="default"
                     style="width: 100%;"
-                    @click.native.prevent="getMenu"
+                    @click.native.prevent="handleLogin"
                 >
                     {{ $t("app.login") }}
                 </el-button>
@@ -68,6 +68,7 @@
 
 <script>
 import storage from '@/util/storage'
+import { json } from 'body-parser'
 
 export default {
     name: 'Login',
@@ -125,8 +126,11 @@ export default {
                             `api/account/get_token?phone=${this.loginForm.account}&code=${this.loginForm.password}`
                         )
                         .then(res => {
+                            //
+                            this.$store.commit('user/setUserData', res)
                             // this.$router.push({ path: this.redirect || '/' })
-                            localStorage.setItem('token', res.token), console.log(res.token)
+                            // eslint-disable-next-line no-debugger
+                            window.localStorage.setItem('anzai_token', res.token)
                             this.getUser()
                         })
                     // this.loading = true
@@ -186,42 +190,44 @@ export default {
         getToken() {
             this.$api.get('api/account/get_token?phone=110&code=110').then(res => {
                 // storage.local.set('token', res.token)
+                console.log(res.token, 'aaaaaaa')
                 this.$store.commit('user/setUserData', res)
                 this.getMenu()
             })
         },
+
+        //
         // 获取当前用户
         getUser() {
-            this.$api.get('api/account/GetUser').then(res => {
-                // console.log(res.token, 'rrr')
-                // this.getMenu()
+            this.$api.get('api/account/userinfo').then(res => {
+                console.log(res, 'rrr')
+                this.getMenu()
             })
         },
         // 获取权限菜单
-        // getMenu() {
-        //     this.$api.get('api/account/get_permission_menu').then(res => {
-        //         console.log(res, '权限列表')
-        //         this.$router.push({path: this.redirect || '/'})
-        //     })
-        // }
         getMenu() {
-            this.$refs.loginForm.validate(valid => {
-                if (valid) {
-                    this.$store.dispatch('user/login').then(() => {
-                        if (this.loginForm.remember) {
-                            storage.local.set('login_account', this.loginForm.account)
-                        } else {
-                            storage.local.remove('login_account')
-                        }
-                        this.$router.push({
-                            path: `/${
-                                JSON.parse(storage.local.get('NcheckRouterData'))[0].perms
-                            }`
-                        })
-                    })
-                }
+            this.$api.get('api/account/get_permission_menu').then(res => {
+                this.$router.push({path: '/dashboard'})
             })
         }
+        // getMenu() {
+        //     this.$refs.loginForm.validate(valid => {好
+        //         if (valid) {
+        //             this.$store.dispatch('user/login').then(() => {
+        //                 if (this.loginForm.remember) {
+        //                     storage.local.set('login_account', this.loginForm.account)
+        //                 } else {
+        //                     storage.local.remove('login_account')
+        //                 }
+        //                 this.$router.push({
+        //                     path: `/${
+        //                         JSON.parse(storage.local.get('NcheckRouterData'))[0].resourceUrl
+        //                     }`
+        //                 })
+        //             })
+        //         }
+        //     })
+        // }
     }
 }
 </script>

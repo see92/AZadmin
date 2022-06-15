@@ -1,8 +1,10 @@
 <template>
     <div>
-        <page-header title="系统管理    ">
+        <page-header title="112323">
             <template #content>
-                <div />
+                <div>
+                    <p>This is System</p>
+                </div>
             </template>
         </page-header>
     </div>

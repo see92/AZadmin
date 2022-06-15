@@ -14,7 +14,7 @@ let newAsyncRoutes = [
 
 const state = {
     account: storage.local.get('account'),
-    token: storage.local.get('token'),
+    token: storage.local.get('anzai_token'),
     failure_time: storage.local.get('failure_time') || '',
     permissions: [],
     //  处理完成
@@ -28,7 +28,7 @@ const state = {
 const getters = {
     isLogin: state => {
         let retn = false
-        if (state.token && state.token != null) {
+        if (state.token) {
             // let unix = Date.parse(new Date())
             // if (unix < state.failure_time * 1000) {
             retn = true
@@ -36,7 +36,7 @@ const getters = {
         }
         return retn
     },
-    // 取未处理
+    // 取未处理 你要看看登录页吗
     getNoCheckData: state => {
         return state.noCheckData
     }
@@ -51,10 +51,9 @@ const actions = {
                     api.get('api/account/get_permission_menu').then(response => {
                         // 后台返回数据
                         response.forEach(item => {
-                            if (item.childrenList && item.childrenList.length > 0) {
-                                item.childrenList.forEach(each => {
-                                    // each.parten = item.resourceUrl
-                                    each.parten = item.perms
+                            if (item.children && item.childrenList.length > 0) {
+                                item.children.forEach(each => {
+                                    each.parten = item.resourceUrl
                                 })
                             }
                         })
@@ -121,8 +120,7 @@ const actions = {
                 item.children.forEach(each => {
                     newCheckData.children.forEach(sourceItem => {
                         if (
-                            // each.resourceUrl == sourceItem.path &&
-                            each.perms == sourceItem.path &&
+                            each.resourceUrl == sourceItem.path &&
                             newCheckData.children.length != item.children.length
                         ) {
                             newChild.push(sourceItem)
@@ -141,8 +139,7 @@ const actions = {
                                 activeMenu: ''
                             }
                         }
-                        // if (!each.resourceUrl || each.resourceUrl && newCheckData.children.length == item.children.length) {
-                        if (!each.perms || each.perms && newCheckData.children.length == item.children.length) {
+                        if (!each.resourceUrl || each.resourceUrl && newCheckData.children.length == item.children.length) {
                             newParent = {
                                 path: newCheckData.path,
                                 name: newCheckData.name,
@@ -151,8 +148,7 @@ const actions = {
                                 meta: newCheckData.meta,
                                 children: newCheckData.children
                             }
-                            // if (sourceItem.name == each.resourceUrl) {
-                            if (sourceItem.name == each.perms) {
+                            if (sourceItem.name == each.resourceUrl) {
                                 sourceItem.meta = {
                                     title: sourceItem.meta.title,
                                     sidebar: true,
@@ -166,8 +162,7 @@ const actions = {
                 // console.log(newAsyncRoutes[0].children, "nnn");
                 newAsyncRoutes[0].children.push(newParent)
             } else {
-                // let newCheckData = _newMap.get(item.resourceUrl)
-                let newCheckData = _newMap.get(item.perms)
+                let newCheckData = _newMap.get(item.resourceUrl)
                 if (!newCheckData) {
                     commit('removeUserData')
                 }
@@ -193,10 +188,9 @@ const actions = {
         return api.get('api/account/get_permission_menu').then(response => {
             // 后台返回数据
             response.forEach(item => {
-                if (item.childrenList && item.childrenList.length > 0) {
-                    item.childrenList.forEach(each => {
-                        // each.parten = item.resourceUrl
-                        each.parten = item.perms
+                if (item.children && item.children.length > 0) {
+                    item.children.forEach(each => {
+                        each.parten = item.resourceUrl
                     })
                 }
             })
@@ -219,6 +213,9 @@ const mutations = {
         // state.token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJBUFAiLCJpc3MiOiJTZXJ2aWNlIiwidXNlcklkIjoiMjMiLCJpYXQiOjE2NTUxMzM0OTV9.BnC8B_pWYMtEmTnFsV7mLHyJ2GvVKt_FWNeG23m1NG4'
         // state.failure_time = data.failure_time
         state.token = data.token
+        console.log(state.token, 'ccccccccccccccccc')
+        state.isLogin = true
+        storage.local.set('anzai_token', `${data.token}`)
     },
     checkRouter(state, data) {
         data.forEach(item => {
@@ -233,7 +230,7 @@ const mutations = {
     },
     removeUserData(state) {
         storage.local.remove('account')
-        storage.local.remove('token')
+        storage.local.remove('anzai_token')
         storage.local.remove('failure_time')
         storage.local.remove('NcheckRouterData')
         state.account = ''

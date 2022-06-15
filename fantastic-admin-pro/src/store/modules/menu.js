@@ -123,7 +123,7 @@ const actions = {
             }
             commit('setRoutes', accessedRoutes)
             commit('setHeaderActived', data.currentPath)
-            let routes = []
+            let routes = [] 
             accessedRoutes.map(item => {
                 routes.push(...item.children)
             })

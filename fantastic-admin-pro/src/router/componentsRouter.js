@@ -3,17 +3,17 @@ let asyncRoutes = [
     {
         children: [
             {
-                path: '/basics',
-                name: 'basics',
+                path: '/system',
+                name: 'system',
                 component: Layout,
-                redirect: '/basics/basicsInformation',
+                redirect: '/system/basicsInformation',
                 meta: {
                     title: '基础信息',
                     icon: 'ri-survey-line'
                 },
                 children: [
                     {
-                        parten: 'basics',
+                        parten: 'system',
                         path: 'basicsInformation',
                         name: 'basicsInformation',
                         component: () =>
@@ -22,7 +22,7 @@ let asyncRoutes = [
                             title: '基础信息',
                             sidebar: false,
                             breadcrumb: false,
-                            activeMenu: '/basics'
+                            activeMenu: '/system'
                         }
                     }
                 ]

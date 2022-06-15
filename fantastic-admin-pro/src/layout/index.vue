@@ -62,7 +62,7 @@
                             'is-collapse-without-logo': $store.state.menu.routes.length > 1 && $store.state.settings.mode == 'pc' && $store.state.settings.sidebarCollapse
                         }"
                         >
-                            <transition-group name="sub-sidebar">
+                            <transition-group name="sub-sidebar">66
                                 <template v-for="route in $store.getters['menu/sidebarRoutes']">
                                     <SidebarItem v-if="route.meta.sidebar !== false" :key="route.path" :item="route" :base-path="route.path" />
                                 </template>

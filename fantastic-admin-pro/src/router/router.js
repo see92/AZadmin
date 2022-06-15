@@ -1,17 +1,25 @@
 [
     {
         adminRoleResourceName: '基础信息',
-        childrenList: [],
+        children: [],
         resourceUrl: 'basics'
     },
     {
         adminRoleResourceName: '用户列表',
-        childrenList: [
+        children: [
             {
                 adminRoleResourceName: '用户列表1',
                 resourceUrl: 'userList'
             }
         ],
         resourceUrl: 'user'
+    }
+],
+
+[
+    {
+        adminRoleResourceName: '基础信息',
+        children: [],
+        resourceUrl: 'basics'
     }
 ]

@@ -20,7 +20,10 @@ const api = axios.create({
     responseType: 'json'
     // withCredentials: true
 })
+const AUTH_TOKEN = window.localStorage.getItem('anzai_token')
 
+api.defaults.headers.common['Authorization'] = `Bearer ${AUTH_TOKEN}`
+console.log(AUTH_TOKEN, `Bearer ${AUTH_TOKEN}`, '00000')
 api.interceptors.request.use(
     request => {
         if (request.method == 'post') {
@@ -31,12 +34,12 @@ api.interceptors.request.use(
                 }
             } else {
                 // 带上 token
-                if (request.data == undefined) {
-                    request.data = {}
-                }
-                if (store.getters['user/isLogin']) {
-                    request.data.token = store.state.user.token
-                }
+                // if (request.data == undefined) {
+                //     request.data = {}
+                // }
+                // if (store.getters['user/isLogin']) {
+                //     request.data.token = store.state.user.token
+                // }
                 // request.data = Qs.stringify(request.data)
             }
         } else {
@@ -48,9 +51,9 @@ api.interceptors.request.use(
                 request.params.token = store.state.user.token
             }
         }
-        console.log(store.state.user.token)
-        console.log(localStorage.getItem('token'))
-        request.headers['Authorization'] = `Bearer ${store.state.user.token}`
+        // console.log(store.state.user.token)
+        // console.log(localStorage.getItem('token'))
+        request.headers['Authorization'] = `Bearer ${AUTH_TOKEN}`
         return request
     }
 )

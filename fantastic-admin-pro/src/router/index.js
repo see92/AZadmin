@@ -36,8 +36,7 @@ const constantRoutes = [
         redirect: fullPath
             ? fullPathData
             : NcheckRouterData
-                // ? NcheckRouterData[0].resourceUrl
-                ? NcheckRouterData[0].perms
+                ? NcheckRouterData[0].resourceUrl
                 : '',
         children: [
             {
@@ -113,9 +112,11 @@ VueRouter.prototype.replace = function replace(location) {
     return originalReplace.call(this, location).catch(err => err)
 }
 
+//
 router.beforeEach(async(to, from, next) => {
     store.state.settings.enableProgress && NProgress.start()
-    // 已经登录，但还没根据权限动态生成并挂载路由`
+    // 已经登录，但还没根据权限动态生成并挂载路由
+    console.log(store.getters['user/isLogin'])
     if (store.getters['user/isLogin'] && !store.state.menu.isGenerate) {
         // 挂载动态路由的同时，根据当前帐号复原固定标签栏
         store.state.settings.enableTabbar &&
@@ -123,7 +124,6 @@ router.beforeEach(async(to, from, next) => {
         router.matcher = new VueRouter({
             routes: constantRoutes
         }).matcher
-
         // 未处理
         let nCheckRoutes = store.getters['user/getNoCheckData']
         if (nCheckRoutes && nCheckRoutes.length > 0) {
@@ -164,7 +164,6 @@ router.beforeEach(async(to, from, next) => {
                         replace: true
                     })
                 }
-
                 if (
                     storage.local.get('fullPath') &&
                     storage.local.get('fullPath').length == 3
@@ -178,7 +177,7 @@ router.beforeEach(async(to, from, next) => {
                         path: storage.local.set('fullPath')
                     })
                 }
-                // }
+            // }
             }
 
             const accessRoutes = await store.dispatch('menu/generateRoutes', {
@@ -191,12 +190,7 @@ router.beforeEach(async(to, from, next) => {
         } else {
             store.commit('user/removeUserData')
             if (to.name != 'login') {
-                next({
-                    name: 'login',
-                    query: {
-                        redirect: to.fullPath
-                    }
-                })
+                next()
             }
         }
     }
@@ -242,16 +236,11 @@ router.beforeEach(async(to, from, next) => {
         }
     } else {
         if (to.name != 'login') {
-            next({
-                name: 'login',
-                query: {
-                    redirect: to.fullPath
-                }
-            })
+            next()
         }
     }
     next()
-})
+})  
 
 router.afterEach(() => {
     store.state.settings.enableProgress && NProgress.done()
